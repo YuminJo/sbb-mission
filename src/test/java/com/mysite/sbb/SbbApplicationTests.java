@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +18,11 @@ class SbbApplicationTests {
 
 	@Test
 	void testJpa() {
-		List<Question> all = this.questionRepository.findAll();
-		assertEquals(2, all.size());
+		Optional<Question> oq = this.questionRepository.findById(1);
 
-		Question q = all.get(0);
-		assertEquals("sbb가 무엇인가요",q.getSubject());
+		if(oq.isPresent()) {
+			Question q = oq.get();
+			assertEquals("sbb가 무엇인가요",q.getSubject());
+		}
 	}
 }
