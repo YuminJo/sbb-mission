@@ -41,15 +41,15 @@ public class QuestionControllerTests {
 	public void connect_QuestionDetail() throws Exception {
 		// 가짜 Question 객체 생성
 		Question fakeQuestion = new Question();
-		fakeQuestion.setId(2);
+		fakeQuestion.setId(1);
 		fakeQuestion.setSubject("Fake Subject");
 		fakeQuestion.setContent("Fake Content");
 
 		// QuestionService의 동작 설정
-		when(questionService.getQuestion(2)).thenReturn(fakeQuestion);
+		when(questionService.getQuestion(1)).thenReturn(fakeQuestion);
 
 		mockMvc.perform(MockMvcRequestBuilders
-				.get("/question/detail/2")
+				.get("/question/detail/1")
 				.accept(MediaType.APPLICATION_JSON))
 			.andExpect(MockMvcResultMatchers.status().isOk())
 			.andExpect(MockMvcResultMatchers.view().name("question_detail"))
