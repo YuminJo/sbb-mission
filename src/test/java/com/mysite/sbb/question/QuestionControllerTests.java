@@ -7,18 +7,26 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import com.mysite.sbb.answer.Answer;
+
+import jakarta.transaction.Transactional;
 
 @WebMvcTest(QuestionController.class)
 @ActiveProfiles("test")
@@ -32,11 +40,31 @@ public class QuestionControllerTests {
 	@Test
 	@DisplayName("[/question/list] 접속")
 	public void connect_QuestionList() throws Exception {
-		mockMvc.perform(get("/question/list")
-				.accept(MediaType.APPLICATION_JSON))
-			.andDo(print())
-			.andExpect(status().isOk())
-			.andReturn();
+		// 가짜 Question 객체 생성
+		Question fakeQuestion = new Question();
+		fakeQuestion.setId(1);
+		fakeQuestion.setSubject("Fake Subject");
+		fakeQuestion.setContent("Fake Content");
+		fakeQuestion.setCreateDate(LocalDateTime.now());
+
+		// Mock 데이터 생성
+		List<Question> questionList = Arrays.asList(
+			fakeQuestion,
+			fakeQuestion,
+			fakeQuestion
+		);
+
+		Page<Question> page = new PageImpl<>(questionList);
+
+		// QuestionService의 동작 설정
+		when(questionService.getList(anyInt())).thenReturn(page);
+
+		mockMvc.perform(get("/question/list"))
+			.andExpect(status().isOk()) // 성공 시 HTTP 200 OK를 반환한다고 가정합니다.
+			.andExpect(view().name("question_list")) // "question_list" 뷰를 반환한다고 가정합니다.
+			.andExpect(model().attributeExists("paging"))
+			.andExpect(model().attribute("paging", page))
+			.andDo(print()); // 디버깅을 위해 요청 및 응답 세부 정보를 출력합니다.
 	}
 
 	@Test
