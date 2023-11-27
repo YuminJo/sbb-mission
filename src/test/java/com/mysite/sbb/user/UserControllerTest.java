@@ -1,10 +1,13 @@
 package com.mysite.sbb.user;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,6 +22,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import com.mysite.sbb.SecurityConfig;
+
+import jakarta.transaction.Transactional;
 
 @WebMvcTest(UserController.class)
 @Import(SecurityConfig.class)
@@ -48,12 +53,34 @@ public class UserControllerTest {
 	@Test
 	@DisplayName("[/user/signup] 회원가입")
 	public void connect_trysignup() throws Exception {
-		performSignup("fakeidab", "fakepw12", "fakepw12", "Fakeemail@gmail.com")
+		// 가상의 사용자를 생성
+		SiteUser fakeUser = createFakeUser("fakeidab", "fakepw12", "Fakeemail@gmail.com");
+
+		// userRepository.findById 메서드가 호출될 때 fakeUser를 반환하도록 설정
+		when(userService.findUser("fakeidab")).thenReturn(Optional.of(fakeUser));
+
+		// 가상의 HTTP POST 요청을 수행하여 회원가입을 시뮬레이트
+		ResultActions resultActions = performSignup("fakeidab", "fakepw12", "fakepw12", "Fakeemail@gmail.com");
+
+		// 응답을 검증
+		resultActions
 			.andExpect(status().is3xxRedirection())
 			.andExpect(handler().handlerType(UserController.class))
 			.andExpect(handler().methodName("signup"))
 			.andExpect(redirectedUrl("/"))
 			.andDo(print());
+
+		// userService.findUser("fakeidab")에서 fakeUser를 얻을 수 있어야 함
+		SiteUser user = userService.findUser("fakeidab").orElseThrow();
+		assertThat(user.getUsername()).isEqualTo("fakeidab");
+	}
+
+	private SiteUser createFakeUser(String username, String password, String email) {
+		SiteUser fakeUser = new SiteUser();
+		fakeUser.setUsername(username);
+		fakeUser.setPassword(password);
+		fakeUser.setEmail(email);
+		return fakeUser;
 	}
 
 	@Test
