@@ -21,6 +21,9 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithAnonymousUser;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -29,6 +32,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import com.mysite.sbb.SecurityConfig;
 import com.mysite.sbb.answer.Answer;
 import com.mysite.sbb.user.UserController;
+import com.mysite.sbb.user.UserService;
 
 @WebMvcTest(QuestionController.class)
 @Import(SecurityConfig.class)
@@ -40,6 +44,9 @@ public class QuestionControllerTest {
 
 	@MockBean
 	private QuestionService questionService;
+
+	@MockBean
+	private UserService userService;
 
 	@Test
 	@DisplayName("[/question/list] 접속")
@@ -85,6 +92,7 @@ public class QuestionControllerTest {
 
 	@Test
 	@DisplayName("[/question/detail/{id}] Fake Question 생성 후 detail/1 접속")
+	@WithMockUser
 	public void fakeqes_connect_QuestionDetail() throws Exception {
 		// 가짜 Answer 객체 생성
 		Answer answer = new Answer();
@@ -117,6 +125,7 @@ public class QuestionControllerTest {
 
 	@Test
 	@DisplayName("[/question/create] Create 접속")
+	@WithMockUser
 	public void connect_QuestionCreate4xxGet() throws Exception {
 		mockMvc.perform(get("/question/create"))
 			.andExpect(handler().handlerType(QuestionController.class))
@@ -128,6 +137,7 @@ public class QuestionControllerTest {
 
 	@Test
 	@DisplayName("[/question/create] Create Post 발송 실패")
+	@WithMockUser
 	public void connect_QuestionCreatePostFailed() throws Exception {
 		MockHttpServletRequestBuilder requestBuilder = post("/question/create")
 			.with(csrf())
@@ -144,6 +154,7 @@ public class QuestionControllerTest {
 
 	@Test
 	@DisplayName("[/question/create] Create Post 빈 제목 발송")
+	@WithMockUser
 	public void connect_QuestionCreatePostEmptySbj() throws Exception {
 		MockHttpServletRequestBuilder requestBuilder = post("/question/create")
 			.with(csrf())
@@ -158,6 +169,7 @@ public class QuestionControllerTest {
 
 	@Test
 	@DisplayName("[/question/create] Create Post 빈 내용 발송")
+	@WithMockUser
 	public void connect_QuestionCreatePostEmptyCon() throws Exception {
 		MockHttpServletRequestBuilder requestBuilder = post("/question/create")
 			.with(csrf())
@@ -172,6 +184,7 @@ public class QuestionControllerTest {
 
 	@Test
 	@DisplayName("[/question/create] Create Post 발송 성공")
+	@WithMockUser
 	public void connect_QuestionCreatePost() throws Exception {
 		MockHttpServletRequestBuilder requestBuilder = post("/question/create")
 			.with(csrf())
