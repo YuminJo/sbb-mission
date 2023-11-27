@@ -1,6 +1,7 @@
 package com.mysite.sbb.answer;
 
 import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -22,6 +23,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import com.mysite.sbb.question.Question;
 import com.mysite.sbb.question.QuestionService;
+import com.mysite.sbb.user.UserController;
 
 @WebMvcTest(AnswerController.class)
 @ActiveProfiles("test")
@@ -40,7 +42,7 @@ public class AnswerControllerTests {
 	public void connect_AnswerCreateId() throws Exception {
 		// 가짜 Question 객체 생성
 		Question fakeQuestion = new Question();
-		fakeQuestion.setId(1);
+		fakeQuestion.setId(0);
 		fakeQuestion.setSubject("Fake Subject");
 		fakeQuestion.setContent("Fake Content");
 		fakeQuestion.setCreateDate(LocalDateTime.now());
@@ -53,9 +55,15 @@ public class AnswerControllerTests {
 		when(questionService.getQuestion(1)).thenReturn(fakeQuestion);
 
 		// 테스트 수행
-		mockMvc.perform(post("/answer/create/1")
-				.param("content", fakeAnswerForm.getContent())) // AnswerForm의 content를 전달
+		mockMvc.perform(post("/answer/create/0")
+				.param("id","0")
+				.param("content", fakeAnswerForm.getContent())
+			.with(csrf())) // AnswerForm의 content를 전달
 			.andExpect(status().is3xxRedirection()) // 3xx 리다이렉션 상태 코드 기대
-			.andExpect(redirectedUrl("/question/detail/1")); // 리다이렉션된 URL 기대
+			.andExpect(handler().handlerType(AnswerController.class))
+			.andExpect(handler().methodName("createAnswer"))
+			.andExpect(view().name("question_detail"))
+			.andExpect(redirectedUrl("/question/detail/1"))
+			.andExpect(model().attribute("question", fakeQuestion));; // 리다이렉션된 URL 기대
 	}
 }
