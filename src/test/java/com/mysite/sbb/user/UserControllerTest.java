@@ -23,8 +23,6 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import com.mysite.sbb.SecurityConfig;
 
-import jakarta.transaction.Transactional;
-
 @WebMvcTest(UserController.class)
 @Import(SecurityConfig.class)
 @AutoConfigureMockMvc
