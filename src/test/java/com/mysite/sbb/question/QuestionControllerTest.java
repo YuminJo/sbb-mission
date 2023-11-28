@@ -196,4 +196,6 @@ public class QuestionControllerTest {
 			.andExpect(redirectedUrl("/question/list"))
 			.andDo(print());
 	}
+
+	//Modify && Delete는 AnswerControllerTest로 대체
 }
