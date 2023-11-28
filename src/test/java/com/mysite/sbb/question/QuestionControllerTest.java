@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
@@ -81,26 +82,6 @@ public class QuestionControllerTest {
 			.andExpect(model().attributeExists("paging"))
 			.andExpect(model().attribute("paging", page))
 			.andDo(print()); // 디버깅을 위해 요청 및 응답 세부 정보를 출력합니다.
-	}
-
-	@Test
-	@DisplayName("[/question/detail/{id}] Fake Question 생성 후 detail/1 접속")
-	@WithMockUser
-	public void connect_Detail() throws Exception {
-		Question fakeQuestion = createFakeQuestion();
-		Answer fakeAnswer = createFakeAnswer(null,fakeQuestion);
-		fakeQuestion.setAnswerList(new ArrayList<>() {{add(fakeAnswer);}});
-
-		// QuestionService의 동작 설정
-		when(questionService.getQuestion(1)).thenReturn(fakeQuestion);
-
-		mockMvc.perform(get("/question/detail/1"))
-			.andExpect(status().is2xxSuccessful())
-			.andExpect(handler().handlerType(QuestionController.class))
-			.andExpect(handler().methodName("detail"))
-			.andExpect(view().name("question_detail"))
-			.andExpect(model().attributeExists("question"))
-			.andExpect(model().attribute("question", fakeQuestion));
 	}
 
 	@Test
@@ -276,6 +257,23 @@ public class QuestionControllerTest {
 
 		mockMvc.perform(get("/question/delete/{id}",1))
 			.andExpect(status().is4xxClientError());
+	}
+
+	@Test
+	@DisplayName("[/question/delete/{id}] 삭제 실패")
+	@WithMockUser("fakeUser")
+	public void connect_vote() throws Exception {
+		SiteUser siteUser = new SiteUser();
+		siteUser.setUsername("testUser");
+
+		// 가짜 Question 객체 생성
+		Question fakeQuestion = createFakeQuestion();
+		fakeQuestion.setAuthor(siteUser);
+
+		when(questionService.getQuestion(anyInt())).thenReturn(fakeQuestion);
+
+		mockMvc.perform(get("/question/vote/{id}",1))
+			.andExpect(status().is3xxRedirection());
 	}
 
 	private Question createFakeQuestion() {

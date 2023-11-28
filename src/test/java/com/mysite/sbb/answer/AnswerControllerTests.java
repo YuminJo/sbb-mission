@@ -188,6 +188,28 @@ public class AnswerControllerTests {
 			.andExpect(status().is4xxClientError());
 	}
 
+	@Test
+	@DisplayName("[/answer/delete/{id}] 추천하기")
+	@WithMockUser
+	public void connect_vote() throws Exception {
+		SiteUser siteUser = new SiteUser();
+		siteUser.setUsername("testUser");
+
+		// 가짜 Question 객체 생성
+		Question fakeQuestion = createFakeQuestion();
+
+		// 가짜 Answer 객체 생성
+		Answer answer = createFakeAnswer(siteUser,fakeQuestion);
+
+		fakeQuestion.setAnswerList(new ArrayList<>() {{add(answer);}});
+
+		when(answerService.getAnswer(anyInt())).thenReturn(answer);
+		when(userService.getUser(any())).thenReturn(siteUser);
+
+		mockMvc.perform(get("/answer/vote/{id}",0))
+			.andExpect(status().is3xxRedirection());
+	}
+
 	private Question createFakeQuestion() {
 		Question fakeQuestion = new Question();
 		fakeQuestion.setId(1);
