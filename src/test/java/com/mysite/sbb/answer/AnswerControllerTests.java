@@ -62,12 +62,13 @@ public class AnswerControllerTests {
 
 		when(questionService.getQuestion(1)).thenReturn(fakeQuestion);
 		when(userService.getUser(any())).thenReturn(siteUser);
+		when(answerService.create(fakeQuestion,answerForm.getContent(), siteUser)).thenReturn(answer);
 
 		mockMvc.perform(post("/answer/create/1")
 				.param("content", answerForm.getContent())
 				.with(csrf())) // AnswerForm의 content를 전달
 			.andExpect(status().is3xxRedirection()) // 3xx 리다이렉션 상태 코드 기대
-			.andExpect(redirectedUrl("/question/detail/1"));
+			.andExpect(redirectedUrl("/question/detail/1#answer_0"));
 	}
 
 	@Test
@@ -116,7 +117,7 @@ public class AnswerControllerTests {
 				.param("content", answerForm.getContent())
 				.with(csrf()))
 			.andExpect(status().is3xxRedirection())
-			.andExpect(redirectedUrl("/question/detail/1"));
+			.andExpect(redirectedUrl("/question/detail/1#answer_0"));
 	}
 
 	@Test
