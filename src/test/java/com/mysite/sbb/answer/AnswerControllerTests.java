@@ -43,7 +43,7 @@ public class AnswerControllerTests {
 	@Test
 	@DisplayName("[/answer/create/{id}] Create Post 발송 성공")
 	@WithMockUser
-	public void connect_AnswerCreateId() throws Exception {
+	public void connect_CreateId() throws Exception {
 		SiteUser siteUser = new SiteUser();
 		siteUser.setUsername("TEST");
 
@@ -71,7 +71,7 @@ public class AnswerControllerTests {
 	}
 
 	@Test
-	@DisplayName("[/answer/modify/1] 접속 성공")
+	@DisplayName("[/answer/modify/{id}] 접속 성공")
 	@WithMockUser("testUser")
 	public void connect_Modify() throws Exception {
 		SiteUser siteUser = new SiteUser();
@@ -146,7 +146,7 @@ public class AnswerControllerTests {
 	}
 
 	@Test
-	@DisplayName("[/answer/delete/1] 삭제 성공")
+	@DisplayName("[/answer/delete/{id}] 삭제 성공")
 	@WithMockUser("testUser")
 	public void connect_Delete() throws Exception {
 		SiteUser siteUser = new SiteUser();
@@ -168,7 +168,7 @@ public class AnswerControllerTests {
 	}
 
 	@Test
-	@DisplayName("[/answer/delete/1] 삭제 실패")
+	@DisplayName("[/answer/delete/{id}] 삭제 실패")
 	@WithMockUser("fakeUser")
 	public void connect_DeleteError() throws Exception {
 		SiteUser siteUser = new SiteUser();
