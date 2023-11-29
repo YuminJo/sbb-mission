@@ -66,7 +66,7 @@ public class QuestionControllerTest {
 		Page<Question> page = new PageImpl<>(questionList);
 
 		// QuestionService의 동작 설정
-		when(questionService.getList(anyInt())).thenReturn(page);
+		when(questionService.getList(anyInt(),any())).thenReturn(page);
 
 		ResultActions resultActions = mockMvc
 			.perform(get("/question/list")
